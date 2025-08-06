@@ -197,36 +197,52 @@ class UtangTracker:
         """Display main dashboard with tabs"""
         self.current_view = "dashboard"
         self.clear_main_frame()
-        
+
         header_frame = ctk.CTkFrame(self.main_frame)
         header_frame.pack(fill="x", pady=(0, 20))
-        
-        welcome_label = ctk.CTkLabel(header_frame, text=f"Welcome, {self.current_user}!", 
-                                   font=ctk.CTkFont(size=24, weight="bold"))
+
+        welcome_label = ctk.CTkLabel(header_frame, text=f"Welcome, {self.current_user}!",
+                                font=ctk.CTkFont(size=24, weight="bold"))
         welcome_label.pack(side="left", padx=20, pady=15)
-        
+
         logout_btn = ctk.CTkButton(header_frame, text="Logout", command=self.show_login_screen,
-                                 width=100, height=35)
+                                width=100, height=35)
         logout_btn.pack(side="right", padx=20, pady=15)
-        
+
         # Tab view
         self.tab_view = ctk.CTkTabview(self.main_frame)
         self.tab_view.pack(fill="both", expand=True, padx=10, pady=10)
-        
+
         self.tab_view.add("Debts")
         self.tab_view.add("Analytics")
         self.tab_view.add("Profile")
-        
-        # Debts tab
+
+        # Theme selection dropdown
+        def change_theme(choice):
+            ctk.set_appearance_mode(choice)
+
+        theme_frame = ctk.CTkFrame(self.tab_view.tab("Debts"))
+        theme_frame.pack(side="bottom", anchor="sw", pady=10, padx=10)
+
+        theme_label = ctk.CTkLabel(theme_frame, text="Theme:", font=ctk.CTkFont(size=14))
+        theme_label.pack(side="left", padx=5)
+
+        theme_var = ctk.StringVar(value="Dark")
+        theme_menu = ctk.CTkOptionMenu(theme_frame, variable=theme_var,
+                                    values=["Dark", "Light", "System"],
+                                    command=change_theme, width=150, height=35)
+        theme_menu.pack(side="left", padx=5)
+
+        # Debts tab content
         button_frame = ctk.CTkFrame(self.tab_view.tab("Debts"))
         button_frame.pack(pady=10)
-        
-        add_debt_btn = ctk.CTkButton(button_frame, text="Add New Debt", 
-                                   command=self.show_add_debt_form, width=200, height=40)
+
+        add_debt_btn = ctk.CTkButton(button_frame, text="Add New Debt",
+                                command=self.show_add_debt_form, width=200, height=40)
         add_debt_btn.pack(side="left", padx=10)
-        
-        quick_add_btn = ctk.CTkButton(button_frame, text="Quick Add Debt", 
-                                    command=self.show_quick_add_debt_form, width=200, height=40)
+
+        quick_add_btn = ctk.CTkButton(button_frame, text="Quick Add Debt",
+                                command=self.show_quick_add_debt_form, width=200, height=40)
         quick_add_btn.pack(side="left", padx=10)
         
         # Search and filter frame
@@ -298,7 +314,7 @@ class UtangTracker:
         # Facebook link with hyperlink
         facebook_label = ctk.CTkLabel(contact_frame, text="Facebook: John Allen", font=ctk.CTkFont(size=14), text_color="blue", cursor="hand2")
         facebook_label.pack(pady=5)
-        facebook_label.bind("<Button-1>", lambda e: webbrowser.open("https://www.facebook.com/allen.cancer"))
+        facebook_label.bind("<Button-1>", lambda e: webbrowser.open("https://www.facebook.com"))
 
         # YouTube channel link with hyperlink
         youtube_label = ctk.CTkLabel(contact_frame, text="YouTube: Chelxii Music", font=ctk.CTkFont(size=14), text_color="blue", cursor="hand2")
@@ -377,7 +393,6 @@ class UtangTracker:
                     # Show contact information
                     contact_info = (
                         "Contact Information:\n\n"
-                        "Phone: +63-936-934-7064\n"
                         "Email: chelxiimusic@gmail.com\n"
                     )
                     contact_label = ctk.CTkLabel(self.profile_frame, text=contact_info,
@@ -400,7 +415,7 @@ class UtangTracker:
         #                             command=self.show_mini_game,
         #                             width=200, height=40)
         #mini_game_btn.pack(pady=10)
-
+    '''''
     def show_mini_game(self):
         """Display the mini-game screen"""
         self.current_view = "mini_game"
@@ -489,7 +504,7 @@ class UtangTracker:
         self.guess_btn = ctk.CTkButton(self.button_frame, text="Guess", command=self.check_guess,
                                     width=120, height=40)
         self.guess_btn.pack(side="left", padx=10)
-
+    '''
 
 
   
@@ -670,6 +685,7 @@ class UtangTracker:
         """Load analytics visualizations and statistics with date range filtering"""
         for widget in self.analytics_frame.winfo_children():
             widget.destroy()
+
         # Clear previous matplotlib figure
         if self.fig is not None:
             plt.close(self.fig)
@@ -679,25 +695,38 @@ class UtangTracker:
         # Date range filter
         filter_frame = ctk.CTkFrame(self.analytics_frame)
         filter_frame.pack(fill="x", padx=10, pady=5)
+
         ctk.CTkLabel(filter_frame, text="Start Date:", font=ctk.CTkFont(size=14)).pack(side="left", padx=5)
         self.analytics_start_date_entry = ctk.CTkEntry(filter_frame, width=150, height=35, placeholder_text="YYYY-MM-DD")
         self.analytics_start_date_entry.pack(side="left", padx=5)
+
         start_cal_button = ctk.CTkButton(filter_frame, text="📅", width=50, height=35,
-                                    command=lambda: self.toggle_analytics_calendar(filter_frame, "start"))
+                                    command=lambda: self.toggle_analytics_calendar("start"))
         start_cal_button.pack(side="left", padx=5)
+
         self.analytics_start_cal = Calendar(filter_frame, selectmode="day", date_pattern="yyyy-mm-dd")
         self.analytics_start_cal.pack_forget()
-        self.analytics_start_cal.bind("<<CalendarSelected>>",
-                                    lambda e: self.update_date(self.analytics_start_date_entry, self.analytics_start_cal))
+
         ctk.CTkLabel(filter_frame, text="End Date:", font=ctk.CTkFont(size=14)).pack(side="left", padx=5)
         self.analytics_end_date_entry = ctk.CTkEntry(filter_frame, width=150, height=35, placeholder_text="YYYY-MM-DD")
         self.analytics_end_date_entry.pack(side="left", padx=5)
+
         end_cal_button = ctk.CTkButton(filter_frame, text="📅", width=50, height=35,
-                                    command=lambda: self.toggle_analytics_calendar(filter_frame, "end"))
+                                command=lambda: self.toggle_analytics_calendar("end"))
         end_cal_button.pack(side="left", padx=5)
+
+        self.analytics_end_cal = Calendar(filter_frame, selectmode="day", date_pattern="yyyy-mm-dd")
+        self.analytics_end_cal.pack_forget()
+
         apply_filter_btn = ctk.CTkButton(filter_frame, text="Apply Filter", command=self.load_analytics,
                                     width=100, height=35)
         apply_filter_btn.pack(side="left", padx=5)
+
+        # Bind calendar selection events
+        self.analytics_start_cal.bind("<<CalendarSelected>>",
+                                    lambda e: self.update_date(self.analytics_start_date_entry, self.analytics_start_cal))
+        self.analytics_end_cal.bind("<<CalendarSelected>>",
+                                lambda e: self.update_date(self.analytics_end_date_entry, self.analytics_end_cal))
 
         # Get date range
         start_date = self.analytics_start_date_entry.get().strip()
@@ -797,7 +826,7 @@ class UtangTracker:
         self.canvas.get_tk_widget().pack(pady=20)
 
    
-    def toggle_analytics_calendar(self, parent, cal_type):
+    def toggle_analytics_calendar(self, cal_type):
         """Toggle visibility of analytics calendar widget"""
         if cal_type == "start":
             calendar = self.analytics_start_cal
@@ -812,6 +841,7 @@ class UtangTracker:
             if other_calendar.winfo_ismapped():
                 other_calendar.pack_forget()
             calendar.pack(pady=5)
+
 
 
     
@@ -950,53 +980,60 @@ class UtangTracker:
     def create_consolidated_debt_details(self, parent, person_data):
         """Create detailed view of consolidated debt"""
         info_text = f"""
-Full Name: {person_data['full_name']}
-Relationship: {person_data['relationship']}
-
-Financial Summary:
-Total Amount Borrowed: ₱{person_data['total_amount']:.2f}
-Total Owed (with interest): ₱{person_data['total_owed']:.2f}
-Total Paid: ₱{person_data['total_paid']:.2f}
-Remaining Balance: ₱{person_data['remaining']:.2f}
+    Full Name: {person_data['full_name']}
+    Relationship: {person_data['relationship']}
+    Financial Summary:
+    Total Amount Borrowed: ₱{person_data['total_amount']:.2f}
+    Total Owed (with interest): ₱{person_data['total_owed']:.2f}
+    Total Paid: ₱{person_data['total_paid']:.2f}
+    Remaining Balance: ₱{person_data['remaining']:.2f}
         """
-        
-        info_label = ctk.CTkLabel(parent, text=info_text, 
+
+        info_label = ctk.CTkLabel(parent, text=info_text,
                                 font=ctk.CTkFont(size=12), justify="left")
         info_label.pack(pady=10, padx=20)
-        
-        history_label = ctk.CTkLabel(parent, text="Debt History:", 
-                                   font=ctk.CTkFont(size=14, weight="bold"))
+
+        history_label = ctk.CTkLabel(parent, text="Debt History:",
+                                font=ctk.CTkFont(size=14, weight="bold"))
         history_label.pack(pady=(10, 5))
-        
+
         for i, debt in enumerate(person_data['debt_history'], 1):
             debt_frame = ctk.CTkFrame(parent)
             debt_frame.pack(fill="x", pady=2, padx=20)
-            
+
             status = self.get_debt_status(debt)
             status_color = {"Overdue": "#FF0000", "Pending": "#FFFF00", "Paid": "#00FF00"}
             debt_text = f"""
-Debt #{i} - Added: {debt['date_added']} (Status: {status})
-Amount: ₱{debt['amount']:.2f} | Interest: {debt['interest_rate']}% | Due: {debt['due_date']}
-Total Owed: ₱{debt['owed']:.2f} | Paid: ₱{debt['payments']:.2f} | Remaining: ₱{debt['remaining']:.2f}
-Notes: {debt['notes'] if debt['notes'] else 'None'}
+    Debt #{i} - Added: {debt['date_added']} (Status: {status})
+    Amount: ₱{debt['amount']:.2f} | Interest: {debt['interest_rate']}% | Due: {debt['due_date']}
+    Total Owed: ₱{debt['owed']:.2f} | Paid: ₱{debt['payments']:.2f} | Remaining: ₱{debt['remaining']:.2f}
+    Notes: {debt['notes'] if debt['notes'] else 'None'}
             """
-            
-            debt_label = ctk.CTkLabel(debt_frame, text=debt_text.strip(), 
+
+            debt_label = ctk.CTkLabel(debt_frame, text=debt_text.strip(),
                                     font=ctk.CTkFont(size=10), text_color=status_color[status])
             debt_label.pack(side="left", pady=5, padx=10)
-            
-            edit_btn = ctk.CTkButton(debt_frame, text="Edit", 
-                                   command=lambda d=debt: self.show_edit_debt_form(person_data, d),
-                                   width=80, height=30)
-            edit_btn.pack(side="right", padx=5)
-            
+
+            button_frame = ctk.CTkFrame(debt_frame)
+            button_frame.pack(side="right", padx=5)
+
+            edit_btn = ctk.CTkButton(button_frame, text="Edit",
+                                command=lambda d=debt: self.show_edit_debt_form(person_data, d),
+                                width=80, height=30)
+            edit_btn.pack(side="left", padx=5)
+
+            delete_btn = ctk.CTkButton(button_frame, text="Delete",
+                                    command=lambda d=debt: self.confirm_delete_debt(d),
+                                    width=80, height=30, fg_color="red")
+            delete_btn.pack(side="left", padx=5)
+
             payments = self.get_payment_history(debt["debt_id"])
             if payments:
                 pay_text = "Payments: " + ", ".join([f"₱{p['payment_amount']} ({p['payment_date']})" for p in payments])
-                pay_label = ctk.CTkLabel(debt_frame, text=pay_text, 
-                                       font=ctk.CTkFont(size=9), text_color="gray")
+                pay_label = ctk.CTkLabel(debt_frame, text=pay_text,
+                                    font=ctk.CTkFont(size=9), text_color="gray")
                 pay_label.pack(pady=(0, 5), padx=10)
-    
+ 
     def toggle_consolidated_details(self, debt_frame, person_data):
         """Toggle visibility of consolidated debt details"""
         if debt_frame.details_visible:
@@ -1474,85 +1511,125 @@ Notes: {debt['notes'] if debt['notes'] else 'None'}
         messagebox.showinfo("Success", "New debt added successfully!")
         self.show_dashboard()
     
+    def confirm_delete_debt(self, debt):
+        """Confirm and delete a specific debt entry"""
+        if messagebox.askyesno("Confirm Delete", f"Are you sure you want to delete this debt entry?"):
+            self.delete_debt_entry(debt)
+
+    def delete_debt_entry(self, debt):
+        """Delete a specific debt entry and its associated payments"""
+        debt_id = debt["debt_id"]
+
+        # Filter out the debt
+        debts = []
+        with open("debt_data.csv", "r") as file:
+            reader = csv.DictReader(file)
+            for row in reader:
+                if row["debt_id"] != debt_id:
+                    debts.append(row)
+
+        with open("debt_data.csv", "w", newline="") as file:
+            fieldnames = ["user", "full_name", "amount", "relationship", "interest_rate",
+                        "date_added", "due_date", "notes", "status", "debt_id"]
+            writer = csv.DictWriter(file, fieldnames=fieldnames)
+            writer.writeheader()
+            writer.writerows(debts)
+
+        # Filter out payments associated with the debt
+        payments = []
+        with open("payments.csv", "r") as file:
+            reader = csv.DictReader(file)
+            for row in reader:
+                if row["debt_id"] != debt_id:
+                    payments.append(row)
+
+        with open("payments.csv", "w", newline="") as file:
+            fieldnames = ["debt_id", "payment_amount", "payment_date"]
+            writer = csv.DictWriter(file, fieldnames=fieldnames)
+            writer.writeheader()
+            writer.writerows(payments)
+
+        messagebox.showinfo("Success", "Debt entry deleted successfully!")
+        self.show_dashboard()
+    
     def show_edit_debt_form(self, person_data, debt):
         """Show edit debt form in main window"""
         self.current_view = "edit_debt"
         self.selected_person_data = person_data
         self.selected_debt = debt
         self.clear_main_frame()
-        
+
         scrollable_frame = ctk.CTkScrollableFrame(self.main_frame)
         scrollable_frame.pack(fill="both", expand=True, padx=20, pady=20)
-        
-        title_label = ctk.CTkLabel(scrollable_frame, text=f"Edit Debt for {person_data['full_name']}", 
-                                 font=ctk.CTkFont(size=24, weight="bold"))
+
+        title_label = ctk.CTkLabel(scrollable_frame, text=f"Edit Debt for {person_data['full_name']}",
+                                font=ctk.CTkFont(size=24, weight="bold"))
         title_label.pack(pady=20)
-        
+
         form_frame = ctk.CTkFrame(scrollable_frame)
         form_frame.pack(pady=20, padx=100, fill="x")
-        
+
         ctk.CTkLabel(form_frame, text="Amount:", font=ctk.CTkFont(size=14)).pack(pady=5)
         self.edit_amount_entry = ctk.CTkEntry(form_frame, width=400, height=35)
         self.edit_amount_entry.insert(0, str(debt['amount']))
         self.edit_amount_entry.pack(pady=5)
-        
+
         ctk.CTkLabel(form_frame, text="Interest Rate (%):", font=ctk.CTkFont(size=14)).pack(pady=5)
         self.edit_interest_entry = ctk.CTkEntry(form_frame, width=400, height=35)
         self.edit_interest_entry.insert(0, str(debt['interest_rate']))
         self.edit_interest_entry.pack(pady=5)
-        
+
         ctk.CTkLabel(form_frame, text="Date Added:", font=ctk.CTkFont(size=14)).pack(pady=5)
         date_frame = ctk.CTkFrame(form_frame)
         date_frame.pack(pady=5)
-        
+
         self.edit_date_added_entry = ctk.CTkEntry(date_frame, width=340, height=35)
         self.edit_date_added_entry.insert(0, debt['date_added'])
         self.edit_date_added_entry.pack(side="left", padx=(0, 5))
-        
+
         self.edit_date_added_cal_button = ctk.CTkButton(date_frame, text="📅", width=50, height=35,
-                                                      command=lambda: self.toggle_calendar(form_frame, 
-                                                         self.edit_date_added_entry, "date_added"))
+            command=lambda: self.toggle_calendar(form_frame, self.edit_date_added_entry, "edit_date_added"))
         self.edit_date_added_cal_button.pack(side="left")
-        
+
         self.edit_date_added_cal = Calendar(form_frame, selectmode="day", date_pattern="yyyy-mm-dd")
         self.edit_date_added_cal.pack_forget()
-        self.edit_date_added_cal.bind("<<CalendarSelected>>", 
-                                     lambda e: self.update_date(self.edit_date_added_entry, self.edit_date_added_cal))
-        
+        self.edit_date_added_cal.bind("<<CalendarSelected>>",
+            lambda e: self.update_date(self.edit_date_added_entry, self.edit_date_added_cal))
+
         ctk.CTkLabel(form_frame, text="Due Date (optional):", font=ctk.CTkFont(size=14)).pack(pady=5)
         due_date_frame = ctk.CTkFrame(form_frame)
         due_date_frame.pack(pady=5)
-        
+
         self.edit_due_date_entry = ctk.CTkEntry(due_date_frame, width=340, height=35, placeholder_text="N/A")
         self.edit_due_date_entry.insert(0, debt['due_date'])
         self.edit_due_date_entry.pack(side="left", padx=(0, 5))
-        
+
         self.edit_due_date_cal_button = ctk.CTkButton(due_date_frame, text="📅", width=50, height=35,
-                                                    command=lambda: self.toggle_calendar(form_frame, 
-                                                       self.edit_due_date_entry, "due_date"))
+            command=lambda: self.toggle_calendar(form_frame, self.edit_due_date_entry, "edit_due_date"))
         self.edit_due_date_cal_button.pack(side="left")
-        
+
         self.edit_due_date_cal = Calendar(form_frame, selectmode="day", date_pattern="yyyy-mm-dd")
         self.edit_due_date_cal.pack_forget()
-        self.edit_due_date_cal.bind("<<CalendarSelected>>", 
-                                   lambda e: self.update_date(self.edit_due_date_entry, self.edit_due_date_cal))
-        
+        self.edit_due_date_cal.bind("<<CalendarSelected>>",
+            lambda e: self.update_date(self.edit_due_date_entry, self.edit_due_date_cal))
+
         ctk.CTkLabel(form_frame, text="Notes (optional):", font=ctk.CTkFont(size=14)).pack(pady=5)
         self.edit_notes_entry = ctk.CTkTextbox(form_frame, width=400, height=80)
         self.edit_notes_entry.insert("1.0", debt['notes'] if debt['notes'] else "")
         self.edit_notes_entry.pack(pady=5)
-        
+
         button_frame = ctk.CTkFrame(form_frame)
         button_frame.pack(pady=20)
-        
+
         save_btn = ctk.CTkButton(button_frame, text="Save Changes", command=self.save_edited_debt,
-                               width=120, height=40)
+                            width=120, height=40)
         save_btn.pack(side="left", padx=10)
-        
+
         cancel_btn = ctk.CTkButton(button_frame, text="Cancel", command=self.show_dashboard,
-                                 width=120, height=40)
+                                width=120, height=40)
         cancel_btn.pack(side="left", padx=10)
-    
+
+
     def save_edited_debt(self):
         """Save edited debt entry"""
         amount = self.edit_amount_entry.get().strip()
