@@ -36,6 +36,10 @@ pip install customtkinter tkcalendar matplotlib pandas numpy
 
 ## Usage
 
+### Option 1: Ready-to-Use EXE (Recommended for Windows Users)
+1. Download the latest `utang_tracker.exe` from the `dist` folder in this repository.
+2. Double-click `utang_tracker.exe` to launch the application—no Python installation required!
+### Option 2: Run from Source
 1. Run the application:
 
     ```sh
